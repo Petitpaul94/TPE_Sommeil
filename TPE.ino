@@ -1,19 +1,15 @@
-#include <SoftwareSerial.h>
-
 // Définition Horloge-Temps-Réel
 #include <Wire.h>
 #include "RTClib.h"
-
 RTC_DS3231 rtc;
-
 
 // Définition Display_Screen
 #include <Arduino.h>
 #include <TM1637Display.h>
-
 // Afficheur connection pins (Digital Pins)
 #define CLK 2
 #define DIO 3
+TM1637Display display(CLK, DIO);
 
 // Buzzer pins
 #define BUZ 9
@@ -24,14 +20,13 @@ RTC_DS3231 rtc;
 
 //Touch Sensor
 #define TOUCH 13
-TM1637Display display(CLK, DIO);
 
 //Definition bluetooth
+#include <SoftwareSerial.h>
 SoftwareSerial mySerial(10, 11); // RX, TX
-// Heure de réveil
+
 
 int alarm = 2500;
-
 int finalTime;
 
 // Notes de musique
@@ -53,7 +48,6 @@ void setup () {
 #ifndef ESP8266
 #endif
   rtc.begin();
-  // following line sets the RTC to the date & time this sketch was compiled
   //rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
   //rtc.adjust(DateTime(2019, 1, 13, 17, 04, 0));
 
@@ -84,7 +78,6 @@ void loop () {
   // Bluetooth donnée reçue
   if (mySerial.available())
     alarm = (mySerial.read());
-
   // Bluetooth données envoyées
   if (Serial.available())
     mySerial.write(Serial.read());
