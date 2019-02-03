@@ -6,7 +6,6 @@
 
 RTC_DS3231 rtc;
 
-//char daysOfTheWeek[7][12] = {"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"};
 
 // Définition Display_Screen
 #include <Arduino.h>
@@ -27,8 +26,13 @@ RTC_DS3231 rtc;
 #define TOUCH 13
 TM1637Display display(CLK, DIO);
 
+//Definition bluetooth
+SoftwareSerial mySerial(10, 11); // RX, TX
 // Heure de réveil
+
 int alarm = 2500;
+
+int finalTime;
 
 // Notes de musique
 #define DON 65
@@ -44,9 +48,6 @@ int alarm = 2500;
 #define LAD 117
 #define SIN 123
 
-//Definition bluetooth
-SoftwareSerial mySerial(10, 11); // RX, TX
-
 void setup () {
   //Setup Horloge-Temps-Réel
 #ifndef ESP8266
@@ -56,22 +57,21 @@ void setup () {
   //rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
   //rtc.adjust(DateTime(2019, 1, 13, 17, 04, 0));
 
-  Serial.begin(9600);
   //Setup Display_Screen
   uint8_t data[] = { 0xff, 0xff, 0xff, 0xff };
   uint8_t blank[] = { 0x00, 0x00, 0x00, 0x00 };
   display.setBrightness(0x0f);
-
-  // All segments on
   display.setSegments(data);
-  delay(2000);
-  // Buzzer output
+
+  // Buzzer
   pinMode(BUZ, OUTPUT);
-  //Touch input
+
+  //Touch
   pinMode(TOUCH, INPUT);
 
-  Serial.begin(9600);
+  //Bluetooth
   mySerial.begin(9600);
+  Serial.begin(9600);
   while (!Serial) {
     ; // wait for serial port to connect. Needed for native USB port only
   }
@@ -81,39 +81,25 @@ void loop () {
   //Touch Sensor test
   int touchValue = digitalRead(TOUCH);
 
-  // Bluetooth
+  // Bluetooth donnée reçue
   if (mySerial.available())
-  {
-    Serial.write(mySerial.read());
     alarm = (mySerial.read());
-  }
+
+  // Bluetooth données envoyées
   if (Serial.available())
     mySerial.write(Serial.read());
 
-  //Récupération de l'heure
-  DateTime now = rtc.now();
-  int finalHour = now.hour();
-  int finalMinute = now.minute();
-  int finalTime = 100 * finalHour + finalMinute;
 
   //Affichage de l'heure
-  display.showNumberDecEx(finalTime, (0b01000000), true);
-  delay(1000);
+  display.showNumberDecEx(calculHeure(), (0b01000000), true);
+  delay(100);
 
   //ALARM
 
-  if (finalTime == alarm || touchValue == HIGH)
+  if (finalTime == alarm)
   {
 
-    for (int i=0; i <= 255; i=i+5){
-
-      // impulsion 
-      analogWrite(LED1, i);
-      analogWrite(LED2, i);
-      delay(1000);
-      }
-      analogWrite(LED1, 0);
-      analogWrite(LED2, 0);
+    allumageProgressif();
 
     auClair(3, 700);
     delay(1400);
@@ -123,12 +109,14 @@ void loop () {
     delay(1400);
     auClair(3, 700);
 
+    // init
     alarm = 2500;
     touchValue = LOW;
   }
 
 }
 
+//Fonction musique partie 1
 void auClair(float octave, int noire)
 {
   tone(BUZ, DON * pow(2, octave), noire);
@@ -169,6 +157,7 @@ void auClair(float octave, int noire)
   delay(noire * 2);
 }
 
+// Fonction  musique partie 2
 void auClairSuite(float octave, int noire)
 {
   tone(BUZ, REN * pow(2, octave + 1), noire);
@@ -198,4 +187,26 @@ void auClairSuite(float octave, int noire)
   delay(noire);
   tone(BUZ, SON * pow(2, octave + 1), noire * 2);
   delay(noire * 2);
+}
+
+// Calcul de l'heure
+int calculHeure()
+{
+  DateTime now = rtc.now();
+  byte finalHour = now.hour();
+  byte finalMinute = now.minute();
+  finalTime = 100 * finalHour + finalMinute;
+  return finalTime;
+}
+
+// Allumage progressif
+void allumageProgressif() {
+
+  for (int i = 0; i <= 255; i = i + 5) {
+    analogWrite(LED1, i);
+    analogWrite(LED2, i);
+    delay(500);
+  }
+  analogWrite(LED1, 0);
+  analogWrite(LED2, 0);
 }
