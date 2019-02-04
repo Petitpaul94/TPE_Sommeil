@@ -31,7 +31,7 @@ SoftwareSerial mySerial(10, 11); // RX, TX
 
 int alarm = 2500;
 int finalTime;
-
+int affichageEcran = 7;
 // Notes de musique
 #define DON 65
 #define DOD 69
@@ -57,7 +57,7 @@ void setup () {
   //Setup Display_Screen
   uint8_t data[] = { 0xff, 0xff, 0xff, 0xff };
   uint8_t blank[] = { 0x00, 0x00, 0x00, 0x00 };
-  display.setBrightness(0x0f);
+  display.setBrightness(affichageEcran);
   display.setSegments(data);
 
   // Buzzer
@@ -77,7 +77,20 @@ void setup () {
 void loop () {
   //Touch Sensor test
   int touchValue = digitalRead(TOUCH);
+  if (touchValue == HIGH) {
+    switch (affichageEcran) {
+      case 7:
+        display.setBrightness(0);
+        break;
+      case 0:
+        display.setBrightness(7);
+        break;
+    }
+    analogWrite(LED1, 255);
+    analogWrite(LED2, 255);
+    delay(3000);
 
+  }
   // Bluetooth donnée reçue
   if (mySerial.available()) {
     alarm = (mySerial.read());
@@ -94,7 +107,6 @@ void loop () {
   delay(100);
 
   //ALARM
-
   if (finalTime == alarm)
   {
 
@@ -110,7 +122,7 @@ void loop () {
 
     // init
     alarm = 2500;
-    touchValue = LOW;
+
   }
 
 }
