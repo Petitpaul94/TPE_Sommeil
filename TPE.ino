@@ -8,6 +8,7 @@ RTC_DS3231 rtc;
 #include <TM1637Display.h>
 #define CLK 2
 #define DIO 3
+TM1637Display display(CLK, DIO);
 
 //Leds pins
 #define LED1 5
@@ -15,7 +16,7 @@ RTC_DS3231 rtc;
 
 //Def température
 #include <dht.h>
-DHT dht
+dht DHT;
 #define DHTPIN 7
 
 // Buzzer pins
@@ -58,7 +59,6 @@ void setup () {
   uint8_t blank[] = { 0x00, 0x00, 0x00, 0x00 };
   display.setBrightness(0x0f);
   display.setSegments(data);
-  TM1637Display display(CLK, DIO);
 
   // Buzzer
   pinMode(BUZ, OUTPUT);
@@ -83,7 +83,7 @@ void loop () {
     alarm = (mySerial.read());
   }
   // Bluetooth données envoyées
-  if (Serial.available()){
+  if (Serial.available()) {
     int tempRead = DHT.read11(DHTPIN);
     mySerial.write(DHT.temperature);
   }
