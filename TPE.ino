@@ -75,22 +75,7 @@ void setup () {
 }
 
 void loop () {
-  //Touch Sensor test
-  int touchValue = digitalRead(TOUCH);
-  if (touchValue == HIGH) {
-    switch (affichageEcran) {
-      case 7:
-        display.setBrightness(0);
-        break;
-      case 0:
-        display.setBrightness(7);
-        break;
-    }
-    analogWrite(LED1, 255);
-    analogWrite(LED2, 255);
-    delay(3000);
-
-  }
+  touchTest();
   // Bluetooth donnée reçue
   if (mySerial.available()) {
     alarm = (mySerial.read());
@@ -111,7 +96,7 @@ void loop () {
   {
 
     allumageProgressif();
-
+    //Musique
     auClair(3, 700);
     delay(1400);
     auClair(3, 700);
@@ -220,4 +205,23 @@ void allumageProgressif() {
   }
   analogWrite(LED1, 0);
   analogWrite(LED2, 0);
+}
+
+//Touch Sensor test
+void touchTest(){
+int touchValue = digitalRead(TOUCH);
+if (touchValue == HIGH) {
+  switch (affichageEcran) {
+    case 7:
+      display.setBrightness(0);
+      break;
+    case 0:
+      display.setBrightness(7);
+      break;
+  }
+  analogWrite(LED1, 255);
+  analogWrite(LED2, 255);
+  delay(3000);
+
+}
 }
