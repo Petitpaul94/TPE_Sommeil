@@ -6,25 +6,27 @@ RTC_DS3231 rtc;
 // Définition Display_Screen
 #include <Arduino.h>
 #include <TM1637Display.h>
-// Afficheur connection pins (Digital Pins)
 #define CLK 2
 #define DIO 3
-TM1637Display display(CLK, DIO);
-
-// Buzzer pins
-#define BUZ 9
 
 //Leds pins
 #define LED1 5
 #define LED2 6
 
-//Touch Sensor
-#define TOUCH 13
+//Def température
+#include <dht.h>
+DHT dht
+#define DHTPIN 7
+
+// Buzzer pins
+#define BUZ 9
 
 //Definition bluetooth
 #include <SoftwareSerial.h>
 SoftwareSerial mySerial(10, 11); // RX, TX
 
+//Touch Sensor
+#define TOUCH 13
 
 int alarm = 2500;
 int finalTime;
@@ -56,6 +58,7 @@ void setup () {
   uint8_t blank[] = { 0x00, 0x00, 0x00, 0x00 };
   display.setBrightness(0x0f);
   display.setSegments(data);
+  TM1637Display display(CLK, DIO);
 
   // Buzzer
   pinMode(BUZ, OUTPUT);
@@ -67,7 +70,7 @@ void setup () {
   mySerial.begin(9600);
   Serial.begin(9600);
   while (!Serial) {
-    ; // wait for serial port to connect. Needed for native USB port only
+    ; // wait for serial port to connect.
   }
 }
 
@@ -76,12 +79,14 @@ void loop () {
   int touchValue = digitalRead(TOUCH);
 
   // Bluetooth donnée reçue
-  if (mySerial.available())
+  if (mySerial.available()) {
     alarm = (mySerial.read());
+  }
   // Bluetooth données envoyées
-  if (Serial.available())
-    mySerial.write(Serial.read());
-
+  if (Serial.available()){
+    int tempRead = DHT.read11(DHTPIN);
+    mySerial.write(DHT.temperature);
+  }
 
   //Affichage de l'heure
   display.showNumberDecEx(calculHeure(), (0b01000000), true);
