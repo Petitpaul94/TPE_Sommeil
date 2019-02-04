@@ -85,7 +85,8 @@ void loop () {
   // Bluetooth données envoyées
   if (Serial.available()) {
     int tempRead = DHT.read11(DHTPIN);
-    mySerial.write(DHT.temperature);
+    mySerial.write(DHT.temperature); //Envoi temp.
+    mySerial.write(analogRead(A0)); //Envoi lum.
   }
 
   //Affichage de l'heure
