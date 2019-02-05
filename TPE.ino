@@ -75,6 +75,7 @@ void setup () {
 }
 
 void loop () {
+sortieAlarm:
 
   lumiereEcran();
 
@@ -92,18 +93,36 @@ void loop () {
   {
 
     allumageProgressif();
+
     //Musique
     auClair(3, 700);
+    if (testArretAlarm() == HIGH) {
+      goto sortieAlarm;
+    }
     delay(1400);
+    if (testArretAlarm() == HIGH) {
+      goto sortieAlarm;
+    }
     auClair(3, 700);
+    if (testArretAlarm() == HIGH) {
+      goto sortieAlarm;
+    }
     delay(1400);
+    if (testArretAlarm() == HIGH) {
+      goto sortieAlarm;
+    }
     auClairSuite(2, 700);
+    if (testArretAlarm() == HIGH) {
+      goto sortieAlarm;
+    }
     delay(1400);
+    if (testArretAlarm() == HIGH) {
+      goto sortieAlarm;
+    }
     auClair(3, 700);
 
     // init
     alarm = 2500;
-
   }
 
 }
@@ -147,37 +166,49 @@ void auClair(float octave, int noire)
   tone(BUZ, DON * pow(2, octave), noire * 2);
 
   delay(noire * 2);
+
 }
 
 // Fonction  musique partie 2
 void auClairSuite(float octave, int noire)
 {
   tone(BUZ, REN * pow(2, octave + 1), noire);
-  delay(noire);
-  noTone(BUZ);
-  tone(BUZ, REN * pow(2, octave + 1), noire);
-  delay(noire);
-  noTone(BUZ);
-  tone(BUZ, REN * pow(2, octave + 1), noire);
-  delay(noire);
-  noTone(BUZ);
-  tone(BUZ, REN * pow(2, octave + 1), noire);
-  delay(noire);
 
+  delay(noire);
+  noTone(BUZ);
+  tone(BUZ, REN * pow(2, octave + 1), noire);
+
+
+  delay(noire);
+  noTone(BUZ);
+  tone(BUZ, REN * pow(2, octave + 1), noire);
+
+  delay(noire);
+  noTone(BUZ);
+  tone(BUZ, REN * pow(2, octave + 1), noire);
+
+  delay(noire);
   tone(BUZ, LAN * pow(2, octave), noire * 2);
+
   delay(noire * 2);
   noTone(BUZ);
   tone(BUZ, LAN * pow(2, octave), noire * 2);
+
   delay(noire * 2);
   tone(BUZ, REN * pow(2, octave + 1), noire);
+
   delay(noire);
   tone(BUZ, DON * pow(2, octave + 1), noire);
+
   delay(noire);
   tone(BUZ, SIN * pow(2, octave), noire);
+
   delay(noire);
   tone(BUZ, LAN * pow(2, octave), noire);
+
   delay(noire);
   tone(BUZ, SON * pow(2, octave + 1), noire * 2);
+
   delay(noire * 2);
 }
 
@@ -221,10 +252,22 @@ void lumiereEcran() {
   }
 }
 
-void communicationBluetooth(){
-    alarm = (mySerial.read());
-    
-    int tempRead = DHT.read11(DHTPIN);
-    mySerial.write(DHT.temperature); //Envoi temp.
-    mySerial.write(analogRead(A0)); //Envoi lum.
+void communicationBluetooth() {
+  alarm = (mySerial.read());
+
+  int tempRead = DHT.read11(DHTPIN);
+  mySerial.write(DHT.temperature); //Envoi temp.
+  mySerial.write(analogRead(A0)); //Envoi lum.
+}
+
+bool testArretAlarm() {
+  int touchValue = digitalRead(TOUCH);
+  if (touchValue == HIGH) {
+    alarm = 2500;
+    return 1 ;
+  }
+  else
+  {
+    return 0;
+  }
 }
