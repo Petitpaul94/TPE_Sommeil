@@ -75,21 +75,17 @@ void setup () {
 }
 
 void loop () {
-  touchTest();
-  // Bluetooth donnée reçue
+
+  lumiereEcran();
+
+  // Bluetooth
   if (mySerial.available()) {
-    alarm = (mySerial.read());
+    communicationBluetooth();
   }
-  // Bluetooth données envoyées
-  if (Serial.available()) {
-    int tempRead = DHT.read11(DHTPIN);
-    mySerial.write(DHT.temperature); //Envoi temp.
-    mySerial.write(analogRead(A0)); //Envoi lum.
-  }
+
 
   //Affichage de l'heure
   display.showNumberDecEx(calculHeure(), (0b01000000), true);
-  delay(100);
 
   //ALARM
   if (finalTime == alarm)
@@ -208,20 +204,27 @@ void allumageProgressif() {
 }
 
 //Touch Sensor test
-void touchTest(){
-int touchValue = digitalRead(TOUCH);
-if (touchValue == HIGH) {
-  switch (affichageEcran) {
-    case 7:
-      display.setBrightness(0);
-      break;
-    case 0:
-      display.setBrightness(7);
-      break;
+void lumiereEcran() {
+  int touchValue = digitalRead(TOUCH);
+  if (touchValue == HIGH) {
+    switch (affichageEcran) {
+      case 7:
+        display.setBrightness(0);
+        break;
+      case 0:
+        display.setBrightness(7);
+        break;
+    }
+    analogWrite(LED1, 255);
+    analogWrite(LED2, 255);
+    delay(3000);
   }
-  analogWrite(LED1, 255);
-  analogWrite(LED2, 255);
-  delay(3000);
-
 }
+
+void communicationBluetooth(){
+    alarm = (mySerial.read());
+    
+    int tempRead = DHT.read11(DHTPIN);
+    mySerial.write(DHT.temperature); //Envoi temp.
+    mySerial.write(analogRead(A0)); //Envoi lum.
 }
