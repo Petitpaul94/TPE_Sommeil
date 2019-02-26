@@ -9,6 +9,8 @@ RTC_DS3231 rtc;
 #define CLK 2
 #define DIO 3
 TM1637Display display(CLK, DIO);
+uint8_t data[] = { 0xff, 0xff, 0xff, 0xff };
+uint8_t blank[] = { 0x00, 0x00, 0x00, 0x00 };
 
 //Leds pins
 #define LED1 5
@@ -31,7 +33,7 @@ SoftwareSerial mySerial(10, 11); // RX, TX
 
 int alarm = 2500;
 int finalTime;
-int affichageEcran = 7;
+bool affichageEcran = HIGH;
 // Notes de musique
 #define DON 65
 #define DOD 69
@@ -55,9 +57,7 @@ void setup () {
   //rtc.adjust(DateTime(2019, 1, 13, 17, 04, 0));
 
   //Setup Display_Screen
-  uint8_t data[] = { 0xff, 0xff, 0xff, 0xff };
-  uint8_t blank[] = { 0x00, 0x00, 0x00, 0x00 };
-  display.setBrightness(affichageEcran);
+  display.setBrightness(7);
   display.setSegments(data);
 
   // Buzzer
@@ -86,7 +86,9 @@ sortieAlarm:
 
 
   //Affichage de l'heure
+  if (affichageEcran == HIGH) {
   display.showNumberDecEx(calculHeure(), (0b01000000), true);
+  }
 
   //ALARM
   if (finalTime == alarm)
@@ -239,13 +241,14 @@ void lumiereEcran() {
   int touchValue = digitalRead(TOUCH);
   if (touchValue == HIGH) {
     switch (affichageEcran) {
-      case 7:
-        display.setBrightness(0);
+      case HIGH:
+        display.setSegments(blank);
         break;
-      case 0:
-        display.setBrightness(7);
+      case LOW:
+        display.setSegments(data);
         break;
     }
+    affichageEcran = !affichageEcran;
     analogWrite(LED1, 255);
     analogWrite(LED2, 255);
     delay(3000);
