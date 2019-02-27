@@ -15,6 +15,8 @@ uint8_t blank[] = { 0x00, 0x00, 0x00, 0x00 };
 //Leds pins
 #define LED1 5
 #define LED2 6
+#define LED3 10
+#define LED4 11
 
 //Def température
 #include <dht.h>
@@ -26,7 +28,7 @@ dht DHT;
 
 //Definition bluetooth
 #include <SoftwareSerial.h>
-SoftwareSerial mySerial(10, 11); // RX, TX
+SoftwareSerial mySerial(8, 12); // RX, TX
 
 //Touch Sensor
 #define TOUCH 13
@@ -87,7 +89,7 @@ sortieAlarm:
 
   //Affichage de l'heure
   if (affichageEcran == HIGH) {
-  display.showNumberDecEx(calculHeure(), (0b01000000), true);
+    display.showNumberDecEx(calculHeure(), (0b01000000), true);
   }
 
   //ALARM
@@ -230,10 +232,14 @@ void allumageProgressif() {
   for (int i = 0; i <= 255; i = i + 5) {
     analogWrite(LED1, i);
     analogWrite(LED2, i);
+    analogWrite(LED3, i);
+    analogWrite(LED4, i);
     delay(500);
   }
   analogWrite(LED1, 0);
   analogWrite(LED2, 0);
+  analogWrite(LED3, 0);
+  analogWrite(LED4, 0);
 }
 
 //Touch Sensor test
@@ -250,10 +256,17 @@ void lumiereEcran() {
     }
     affichageEcran = !affichageEcran;
     analogWrite(LED1, 255);
+    delay(1000);
     analogWrite(LED2, 255);
-    delay(3000);
+    delay(1000);
+    analogWrite(LED3, 255);
+    delay(1000);
+    analogWrite(LED4, 255);
+    delay(2500);
     analogWrite(LED1, 0);
     analogWrite(LED2, 0);
+    analogWrite(LED3, 0);
+    analogWrite(LED4, 0);
   }
 }
 
