@@ -82,7 +82,7 @@ sortieAlarm:
   lumiereEcran();
 
   // Bluetooth
-  if (Serial.available()) {
+  if (mySerial.available()) {
     communicationBluetooth();
   }
 
@@ -271,8 +271,10 @@ void lumiereEcran() {
 }
 
 void communicationBluetooth() {
-  alarm = (mySerial.read());
-  Serial.println(alarm);
+  String lectureEnvoi = "";
+  lectureEnvoi = mySerial.readString();
+  alarm = lectureEnvoi.toInt();
+
   int tempRead = DHT.read11(DHTPIN);
   mySerial.write(DHT.temperature); //Envoi temp.
   mySerial.write(analogRead(A0)); //Envoi lum.
