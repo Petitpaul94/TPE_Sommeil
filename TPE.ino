@@ -19,16 +19,17 @@ uint8_t blank[] = { 0x00, 0x00, 0x00, 0x00 };
 #define LED4 11
 
 //Def température
-#include <dht.h>
-dht DHT;
-#define DHTPIN 7
+#include "DHT.h"
+#define DHTPIN 7 // broche ou l'on a branche le capteur
+#define DHTTYPE DHT11 // DHT 11
+DHT dht(DHTPIN, DHTTYPE);//déclaration du capteur
 
 // Buzzer pins
 #define BUZ 9
 
 //Definition bluetooth
 #include <SoftwareSerial.h>
-SoftwareSerial mySerial(8, 12); // RX, TX
+SoftwareSerial mySerial(12, 8); // RX, TX
 
 //Touch Sensor
 #define TOUCH 13
@@ -51,6 +52,9 @@ bool affichageEcran = HIGH;
 #define SIN 123
 
 void setup () {
+  //Setup DHT11
+  dht.begin();
+
   //Setup Horloge-Temps-Réel
 #ifndef ESP8266
 #endif
@@ -275,9 +279,8 @@ void communicationBluetooth() {
   lectureEnvoi = mySerial.readString();
   alarm = lectureEnvoi.toInt();
 
-  int tempRead = DHT.read11(DHTPIN);
-  mySerial.write(DHT.temperature); //Envoi temp.
-  mySerial.write(analogRead(A0)); //Envoi lum.
+  mySerial.write(dht.readTemperature()); //Envoi temp.
+  mySerial.write(analogRead(A3)); //Envoi lum.
 }
 
 bool testArretAlarm() {
